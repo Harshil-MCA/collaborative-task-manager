@@ -38,13 +38,28 @@ router.get("/", async (req, res) => {
       req.user.role === "Manager"
         ? { createdBy: req.user._id }
         : { assignee: req.user._id };
+    const search = typeof req.query.search === "string" ? req.query.search.trim() : "";
+    if (search) filter.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+    ];
+    if (["Pending", "In Progress", "Completed"].includes(req.query.status)) {
+      filter.status = req.query.status;
+    }
+    const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
+    const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 25, 1), 100);
 
-    const tasks = await Task.find(filter)
+    const [tasks, total] = await Promise.all([
+      Task.find(filter)
       .populate("assignee", "name email")
       .populate("createdBy", "name email")
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit),
+      Task.countDocuments(filter),
+    ]);
 
-    res.json({ tasks });
+    res.json({ tasks, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ message: "Unable to retrieve tasks" });
@@ -59,19 +74,31 @@ router.get("/dashboard", async (req, res) => {
         ? { createdBy: req.user._id }
         : { assignee: req.user._id };
 
-    const tasks = await Task.find(filter)
+    const search = typeof req.query.search === "string" ? req.query.search.trim() : "";
+    if (search) filter.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+    ];
+    const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
+    const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 25, 1), 100);
+    const [tasks, total] = await Promise.all([
+      Task.find(filter)
       .populate("assignee", "name email")
       .populate("createdBy", "name email")
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit),
+      Task.countDocuments(filter),
+    ]);
 
     const counts = {
-      total: tasks.length,
+      total,
       pending: tasks.filter((t) => t.status === "Pending").length,
       inProgress: tasks.filter((t) => t.status === "In Progress").length,
       completed: tasks.filter((t) => t.status === "Completed").length,
     };
 
-    res.json({ counts, tasks });
+    res.json({ counts, tasks, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ message: "Unable to load dashboard" });

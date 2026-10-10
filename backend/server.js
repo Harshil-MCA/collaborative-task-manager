@@ -8,6 +8,7 @@ const rateLimit = require("express-rate-limit");
 
 const authRoutes = require("./routes/authRoutes");
 const taskRoutes = require("./routes/taskRoutes");
+const advancedRoutes = require("./routes/advancedRoutes");
 
 const app = express();
 
@@ -31,6 +32,17 @@ app.use(
   })
 );
 
+app.use(
+  "/api/auth",
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 30,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: { message: "Too many authentication requests; try again later" },
+  })
+);
+
 // API home
 app.get("/", (req, res) => {
   res.json({
@@ -51,6 +63,9 @@ app.get("/api/health", (req, res) => {
 
 // Authentication APIs
 app.use("/api/auth", authRoutes);
+
+// Project, sprint, development, QA, defect and release APIs.
+app.use("/api", advancedRoutes);
 
 // Task management APIs
 app.use("/api/tasks", taskRoutes);
@@ -87,4 +102,11 @@ async function startServer() {
   }
 }
 
-startServer();
+if (require.main === module) {
+  startServer();
+}
+
+module.exports = {
+  app,
+  startServer,
+};

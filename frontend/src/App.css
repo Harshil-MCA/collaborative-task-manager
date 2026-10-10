@@ -459,6 +459,67 @@ a {
   cursor: not-allowed;
 }
 
+.advanced-workspace { margin-top: 24px; }
+.advanced-workspace select { max-width: 260px; }
+.advanced-form {
+  padding: 16px;
+  margin: 20px 0;
+  border: 1px solid #e8eaf0;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+.advanced-form h3 { margin-top: 0; }
+.advanced-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+.advanced-form-grid input {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #d8deea;
+  border-radius: 8px;
+}
+.advanced-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+.advanced-tabs button { color: #4338ca; background: #eef0ff; }
+.advanced-tabs button.active { color: white; background: #4f46e5; }
+.advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+.advanced-card, .advanced-row {
+  padding: 16px;
+  border: 1px solid #e8eaf0;
+  border-radius: 12px;
+  background: white;
+}
+.advanced-card { display: grid; gap: 8px; }
+.advanced-card span { color: #64748b; font-size: 13px; }
+.advanced-card strong { font-size: 26px; }
+.advanced-card p, .advanced-row p { margin: 0; color: #64748b; }
+.advanced-list { display: grid; gap: 10px; }
+.advanced-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.bug-details { display: grid; gap: 8px; min-width: 0; }
+.bug-controls, .bug-fix-form { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; margin-top: 8px; }
+.bug-controls label { display: grid; gap: 4px; font-size: 13px; }
+.bug-controls select, .bug-fix-form input { padding: 8px; border: 1px solid #d8deea; border-radius: 8px; }
+.bug-fix-form input { min-width: 180px; }
+.bug-details a { color: #4338ca; overflow-wrap: anywhere; }
+.dark .bug-controls select, .dark .bug-fix-form input { color: #f3f4f6; background: #111827; border-color: #4b5563; }
+.dark .advanced-form { background: #111827; border-color: #374151; }
+.dark .advanced-card, .dark .advanced-row { background: #1f2937; border-color: #374151; }
+.dark .advanced-form-grid input {
+  color: #f3f4f6;
+  background: #111827;
+  border-color: #4b5563;
+}
+
 /* =========================================
    13. DARK MODE
 ========================================= */

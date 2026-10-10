@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import api from './api'
 import './App.css'
+import AdvancedWorkspace from './AdvancedWorkspace'
 
 const emptyForm = {
   title: '',
@@ -87,14 +88,6 @@ function App() {
   // Load real tasks after authentication.
   useEffect(() => {
     if (!user) {
-      setTasks([])
-      setCounts({
-        total: 0,
-        pending: 0,
-        inProgress: 0,
-        completed: 0,
-      })
-      setUsers([])
       return
     }
 
@@ -467,6 +460,8 @@ function App() {
               <span>Finished tasks</span>
             </article>
           </section>
+
+          <AdvancedWorkspace user={user} />
 
           {isManager && (
             <section className="tasks-panel">

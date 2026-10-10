@@ -23,11 +23,13 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["Manager", "User"],
+      enum: ["Manager", "Project Manager", "Developer", "QA Tester", "User"],
       default: "User",
     },
   },
   { timestamps: true }
 );
+
+userSchema.index({ role: 1, name: 1 });
 
 module.exports = mongoose.model("User", userSchema);
