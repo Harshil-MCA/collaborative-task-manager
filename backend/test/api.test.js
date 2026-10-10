@@ -10,7 +10,12 @@ const { MongoMemoryServer } = require("mongodb-memory-server");
 const { test, before, after, beforeEach } = require("node:test");
 const assert = require("node:assert/strict");
 
-const { app } = require("../server");
+const {
+  app,
+  allowedClientOrigins,
+  isAllowedClientOrigin,
+  validateRuntimeConfig,
+} = require("../server");
 const User = require("../models/User");
 const Task = require("../models/Task");
 const Project = require("../models/Project");
@@ -129,6 +134,35 @@ test("rejects unauthenticated and invalid login requests", async () => {
     .send({ email: manager.email, password: "wrong-password" });
 
   assert.equal(invalidLogin.status, 401);
+
+  const unknownAccount = await request(app)
+    .post("/api/auth/login")
+    .send({ email: "does-not-exist@test.example", password: "Password123!" });
+
+  assert.equal(unknownAccount.status, 401);
+  assert.deepEqual(unknownAccount.body, { message: "Invalid email or password" });
+});
+
+test("normalizes login email without changing the stored account", async () => {
+  const response = await request(app)
+    .post("/api/auth/login")
+    .send({ email: `  ${manager.email.toUpperCase()}  `, password: "Password123!" });
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.user.email, manager.email);
+  assert.ok(response.body.token);
+});
+
+test("authenticates all supported roles and validates runtime configuration", async () => {
+  for (const token of [managerToken, userToken, developerToken, qaToken]) assert.ok(token);
+  assert.throws(() => validateRuntimeConfig({ MONGODB_URI: "", JWT_SECRET: "" }), /Missing MONGODB_URI or JWT_SECRET/);
+  assert.doesNotThrow(() => validateRuntimeConfig({ MONGODB_URI: "mongodb://test", JWT_SECRET: "test-secret" }));
+  assert.ok(allowedClientOrigins().has("http://localhost:5173"));
+  assert.ok(allowedClientOrigins().has("http://127.0.0.1:5173"));
+  assert.equal(isAllowedClientOrigin("http://localhost:5174"), true);
+  assert.equal(isAllowedClientOrigin("http://127.0.0.1:4173"), true);
+  assert.equal(isAllowedClientOrigin("https://localhost:5173"), false);
+  assert.equal(isAllowedClientOrigin("http://example.test:5173"), false);
 });
 
 test("enforces task creation, ownership and status authorization", async () => {

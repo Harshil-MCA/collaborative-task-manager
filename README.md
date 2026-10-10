@@ -83,7 +83,7 @@ npm install
 npm run dev
 ```
 
-The default frontend API base URL is `http://localhost:5000/api`.
+The frontend uses `VITE_API_URL` when provided; otherwise it targets port 5000 on the browser's current hostname. This supports both `localhost` and `127.0.0.1` local development. The backend allows the configured `CLIENT_URL` and its localhost/127.0.0.1 counterpart only when using the default local origin.
 
 ## Workflows
 
@@ -137,7 +137,7 @@ npm run lint
 npm run build
 ```
 
-The backend suite uses Node's test runner, Supertest, and MongoDB Memory Server. It does not use the configured MongoDB database. Browser and live MongoDB verification must be reported separately; this workspace has not observed a live browser session.
+The backend suite uses Node's test runner, Supertest, and MongoDB Memory Server. It does not use the configured MongoDB database. Browser and live MongoDB verification must be reported separately. A network/CORS error is reported distinctly from invalid credentials in the frontend.
 
 ## Security notes
 

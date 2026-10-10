@@ -164,6 +164,7 @@ function App() {
     } catch (err) {
       setError(
         err.response?.data?.message ||
+        (err.request && 'Unable to reach the authentication server. Check that the backend is running and the browser origin is allowed.') ||
         'Authentication failed. Check your details and try again.'
       )
     } finally {

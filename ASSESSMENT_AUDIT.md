@@ -349,6 +349,12 @@ QA access verification:
 
 QA bug visibility is restricted to authorized projects and `Ready for Retest` bugs; Developers remain restricted to their assigned bugs and Manager/Project Manager controls remain protected.
 
+## Authentication diagnosis
+
+The authentication route and isolated test setup were verified: MongoDB was reported connected by the browser-facing `/api/health` endpoint, login payloads use `{ email, password }`, emails are trimmed/lowercased, passwords use bcrypt-compatible hashes, and the existing setup successfully authenticates Manager, User, Developer, and QA Tester accounts. The reproducible browser-facing defect was local-origin compatibility: when the frontend is opened at `127.0.0.1:5173`, the backend previously returned only `http://localhost:5173` as its CORS origin, so Axios received a network/CORS failure and displayed the generic authentication message.
+
+The minimal fix makes the frontend target the current browser hostname by default and permits only the configured local origin plus its localhost/127.0.0.1 counterpart. Missing runtime configuration still fails startup; database connection failures still stop startup and are logged without secrets. Passwords and existing user records were not changed.
+
 Updated verification:
 
 - Backend tests: PASS — 5 passed, 0 failed.
